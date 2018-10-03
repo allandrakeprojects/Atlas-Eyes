@@ -35,7 +35,7 @@
             this.webBrowser = new System.Windows.Forms.WebBrowser();
             this.panel_settings = new System.Windows.Forms.Panel();
             this.groupBox_maintenance = new System.Windows.Forms.GroupBox();
-            this.dataGridView1 = new System.Windows.Forms.DataGridView();
+            this.dataGridView_maintenance = new System.Windows.Forms.DataGridView();
             this.dataGridViewTextBoxColumn3 = new System.Windows.Forms.DataGridViewTextBoxColumn();
             this.pictureBox_loader = new System.Windows.Forms.PictureBox();
             this.groupBox_result = new System.Windows.Forms.GroupBox();
@@ -51,9 +51,11 @@
             this.textBox_threshold = new System.Windows.Forms.TextBox();
             this.label_threshold = new System.Windows.Forms.Label();
             this.timer_get_data = new System.Windows.Forms.Timer(this.components);
+            this.label_result = new System.Windows.Forms.Label();
+            this.label1 = new System.Windows.Forms.Label();
             this.panel_settings.SuspendLayout();
             this.groupBox_maintenance.SuspendLayout();
-            ((System.ComponentModel.ISupportInitialize)(this.dataGridView1)).BeginInit();
+            ((System.ComponentModel.ISupportInitialize)(this.dataGridView_maintenance)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.pictureBox_loader)).BeginInit();
             this.groupBox_result.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.dataGridView_result)).BeginInit();
@@ -88,7 +90,8 @@
             // 
             // groupBox_maintenance
             // 
-            this.groupBox_maintenance.Controls.Add(this.dataGridView1);
+            this.groupBox_maintenance.Controls.Add(this.label1);
+            this.groupBox_maintenance.Controls.Add(this.dataGridView_maintenance);
             this.groupBox_maintenance.Location = new System.Drawing.Point(36, 176);
             this.groupBox_maintenance.Name = "groupBox_maintenance";
             this.groupBox_maintenance.Size = new System.Drawing.Size(262, 146);
@@ -96,28 +99,31 @@
             this.groupBox_maintenance.TabStop = false;
             this.groupBox_maintenance.Text = "Maintenance";
             // 
-            // dataGridView1
+            // dataGridView_maintenance
             // 
-            this.dataGridView1.AllowUserToAddRows = false;
-            this.dataGridView1.AllowUserToDeleteRows = false;
-            this.dataGridView1.AllowUserToResizeColumns = false;
-            this.dataGridView1.AllowUserToResizeRows = false;
-            this.dataGridView1.AutoSizeColumnsMode = System.Windows.Forms.DataGridViewAutoSizeColumnsMode.Fill;
-            this.dataGridView1.BackgroundColor = System.Drawing.Color.White;
-            this.dataGridView1.BorderStyle = System.Windows.Forms.BorderStyle.None;
-            this.dataGridView1.ColumnHeadersHeightSizeMode = System.Windows.Forms.DataGridViewColumnHeadersHeightSizeMode.AutoSize;
-            this.dataGridView1.Columns.AddRange(new System.Windows.Forms.DataGridViewColumn[] {
+            this.dataGridView_maintenance.AllowUserToAddRows = false;
+            this.dataGridView_maintenance.AllowUserToDeleteRows = false;
+            this.dataGridView_maintenance.AllowUserToResizeColumns = false;
+            this.dataGridView_maintenance.AllowUserToResizeRows = false;
+            this.dataGridView_maintenance.AutoSizeColumnsMode = System.Windows.Forms.DataGridViewAutoSizeColumnsMode.Fill;
+            this.dataGridView_maintenance.BackgroundColor = System.Drawing.Color.White;
+            this.dataGridView_maintenance.BorderStyle = System.Windows.Forms.BorderStyle.None;
+            this.dataGridView_maintenance.ColumnHeadersHeightSizeMode = System.Windows.Forms.DataGridViewColumnHeadersHeightSizeMode.AutoSize;
+            this.dataGridView_maintenance.Columns.AddRange(new System.Windows.Forms.DataGridViewColumn[] {
             this.dataGridViewTextBoxColumn3});
-            this.dataGridView1.Location = new System.Drawing.Point(11, 19);
-            this.dataGridView1.Name = "dataGridView1";
-            this.dataGridView1.RowHeadersVisible = false;
-            this.dataGridView1.Size = new System.Drawing.Size(240, 115);
-            this.dataGridView1.TabIndex = 3;
+            this.dataGridView_maintenance.Dock = System.Windows.Forms.DockStyle.Fill;
+            this.dataGridView_maintenance.Location = new System.Drawing.Point(3, 16);
+            this.dataGridView_maintenance.Name = "dataGridView_maintenance";
+            this.dataGridView_maintenance.ReadOnly = true;
+            this.dataGridView_maintenance.RowHeadersVisible = false;
+            this.dataGridView_maintenance.Size = new System.Drawing.Size(256, 127);
+            this.dataGridView_maintenance.TabIndex = 3;
             // 
             // dataGridViewTextBoxColumn3
             // 
             this.dataGridViewTextBoxColumn3.HeaderText = "Game Provider";
             this.dataGridViewTextBoxColumn3.Name = "dataGridViewTextBoxColumn3";
+            this.dataGridViewTextBoxColumn3.ReadOnly = true;
             // 
             // pictureBox_loader
             // 
@@ -131,6 +137,7 @@
             // 
             // groupBox_result
             // 
+            this.groupBox_result.Controls.Add(this.label_result);
             this.groupBox_result.Controls.Add(this.dataGridView_result);
             this.groupBox_result.Location = new System.Drawing.Point(334, 57);
             this.groupBox_result.Name = "groupBox_result";
@@ -162,12 +169,13 @@
             dataGridViewCellStyle1.SelectionForeColor = System.Drawing.SystemColors.ControlText;
             dataGridViewCellStyle1.WrapMode = System.Windows.Forms.DataGridViewTriState.False;
             this.dataGridView_result.DefaultCellStyle = dataGridViewCellStyle1;
+            this.dataGridView_result.Dock = System.Windows.Forms.DockStyle.Fill;
             this.dataGridView_result.EditMode = System.Windows.Forms.DataGridViewEditMode.EditOnEnter;
-            this.dataGridView_result.Location = new System.Drawing.Point(6, 19);
+            this.dataGridView_result.Location = new System.Drawing.Point(3, 16);
             this.dataGridView_result.Name = "dataGridView_result";
             this.dataGridView_result.ReadOnly = true;
             this.dataGridView_result.RowHeadersVisible = false;
-            this.dataGridView_result.Size = new System.Drawing.Size(406, 240);
+            this.dataGridView_result.Size = new System.Drawing.Size(413, 246);
             this.dataGridView_result.TabIndex = 2;
             this.dataGridView_result.CellContentClick += new System.Windows.Forms.DataGridViewCellEventHandler(this.dataGridView_result_CellContentClick);
             this.dataGridView_result.DataBindingComplete += new System.Windows.Forms.DataGridViewBindingCompleteEventHandler(this.dataGridView_result_DataBindingComplete);
@@ -262,6 +270,24 @@
             this.timer_get_data.Interval = 2000;
             this.timer_get_data.Tick += new System.EventHandler(this.timer_get_data_Tick);
             // 
+            // label_result
+            // 
+            this.label_result.AutoSize = true;
+            this.label_result.Location = new System.Drawing.Point(7, 43);
+            this.label_result.Name = "label_result";
+            this.label_result.Size = new System.Drawing.Size(127, 13);
+            this.label_result.TabIndex = 3;
+            this.label_result.Text = "No data available in table";
+            // 
+            // label1
+            // 
+            this.label1.AutoSize = true;
+            this.label1.Location = new System.Drawing.Point(8, 45);
+            this.label1.Name = "label1";
+            this.label1.Size = new System.Drawing.Size(127, 13);
+            this.label1.TabIndex = 4;
+            this.label1.Text = "No data available in table";
+            // 
             // Main_Form
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
@@ -277,9 +303,11 @@
             this.Load += new System.EventHandler(this.Main_Form_Load);
             this.panel_settings.ResumeLayout(false);
             this.groupBox_maintenance.ResumeLayout(false);
-            ((System.ComponentModel.ISupportInitialize)(this.dataGridView1)).EndInit();
+            this.groupBox_maintenance.PerformLayout();
+            ((System.ComponentModel.ISupportInitialize)(this.dataGridView_maintenance)).EndInit();
             ((System.ComponentModel.ISupportInitialize)(this.pictureBox_loader)).EndInit();
             this.groupBox_result.ResumeLayout(false);
+            this.groupBox_result.PerformLayout();
             ((System.ComponentModel.ISupportInitialize)(this.dataGridView_result)).EndInit();
             this.groupBox_settings.ResumeLayout(false);
             this.groupBox_settings.PerformLayout();
@@ -304,10 +332,12 @@
         private System.Windows.Forms.DataGridViewTextBoxColumn main_wallet;
         private System.Windows.Forms.DataGridViewTextBoxColumn gp_wallet;
         private System.Windows.Forms.GroupBox groupBox_maintenance;
-        private System.Windows.Forms.DataGridView dataGridView1;
+        private System.Windows.Forms.DataGridView dataGridView_maintenance;
         private System.Windows.Forms.DataGridViewTextBoxColumn dataGridViewTextBoxColumn3;
         private System.Windows.Forms.DataGridViewTextBoxColumn total;
         private System.Windows.Forms.Timer timer_get_data;
+        private System.Windows.Forms.Label label1;
+        private System.Windows.Forms.Label label_result;
     }
 }
 

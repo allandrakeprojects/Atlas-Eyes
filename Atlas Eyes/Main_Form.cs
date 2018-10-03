@@ -1,4 +1,5 @@
-﻿using System;
+﻿using ChoETL;
+using System;
 using System.Drawing;
 using System.IO;
 using System.Linq;
@@ -19,7 +20,7 @@ namespace Atlas_Eyes
         private int current_player = 0;
         private string player_id;
         private string player_name;
-        private string player_name_inner;
+        string path_gp = Path.GetTempPath() + "/ae_gameprovider.txt";
 
         public Main_Form()
         {
@@ -29,6 +30,8 @@ namespace Atlas_Eyes
         private void Main_Form_Load(object sender, EventArgs e)
         {
             webBrowser.Navigate("http://cs.tianfa86.org/account/login");
+            
+
         }
 
         private void webBrowser_DocumentCompleted(object sender, WebBrowserDocumentCompletedEventArgs e)
@@ -129,9 +132,67 @@ namespace Atlas_Eyes
             wc.Encoding = Encoding.UTF8;
             wc.Headers.Add("Content-Type", "application/x-www-form-urlencoded");
             string result = wc.DownloadString("http://cs.tianfa86.org/kzb/gp/v1/gps?playerid=" + player_id);
-            MessageBox.Show(Uri.UnescapeDataString(result));
-            
+            //MessageBox.Show(Uri.UnescapeDataString(result));
 
+            //using (StreamWriter file = new StreamWriter(path_gp, true, Encoding.UTF8))
+            //{
+            //    file.WriteLine(result);
+            //}
+
+            string reversestring = "";
+            int length = result.Length - 1;
+            while (length >= 0)
+            {
+                reversestring = reversestring + result[length];
+                length--;
+            }
+
+            MessageBox.Show(reversestring);
+
+            int count_remove_start = 0;
+            int count_remove_end = 0;
+
+            foreach (char c in reversestring)
+            {
+                count_remove_end++;
+
+                if (c == ',')
+                {
+                    break;
+                }
+            }
+
+            foreach (char c in result)
+            {
+                count_remove_start++;
+
+                if (c == '[')
+                {
+                    break;
+                }
+            }
+
+            result = result.Remove(count_remove_start, 1);
+            string final_result = result.Remove(result.Length - count_remove_end) + "}";
+
+            MessageBox.Show(final_result);
+
+            try
+            {
+                using (var csv = new ChoCSVWriter(path_gp).WithFirstLineHeader())
+                {
+                    using (var p = ChoJSONReader.LoadText(final_result).WithJSONPath("$...data"))
+                    {
+                        csv.Write(p.Select(i => new {
+                            Header_Test_Header = i.id + i.flag
+                        }));
+                    }
+                }
+            }
+            catch (Exception err)
+            {
+                MessageBox.Show(err.ToString());
+            }
 
 
 
