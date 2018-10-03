@@ -32,7 +32,6 @@
             System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(Main_Form));
             System.Windows.Forms.DataGridViewCellStyle dataGridViewCellStyle1 = new System.Windows.Forms.DataGridViewCellStyle();
             this.timer_search_preview = new System.Windows.Forms.Timer(this.components);
-            this.timer_view_player = new System.Windows.Forms.Timer(this.components);
             this.webBrowser = new System.Windows.Forms.WebBrowser();
             this.panel_settings = new System.Windows.Forms.Panel();
             this.groupBox_maintenance = new System.Windows.Forms.GroupBox();
@@ -51,7 +50,7 @@
             this.label_seconds = new System.Windows.Forms.Label();
             this.textBox_threshold = new System.Windows.Forms.TextBox();
             this.label_threshold = new System.Windows.Forms.Label();
-            this.timer_get_value = new System.Windows.Forms.Timer(this.components);
+            this.timer_get_data = new System.Windows.Forms.Timer(this.components);
             this.panel_settings.SuspendLayout();
             this.groupBox_maintenance.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.dataGridView1)).BeginInit();
@@ -66,18 +65,13 @@
             this.timer_search_preview.Interval = 3000;
             this.timer_search_preview.Tick += new System.EventHandler(this.timer_search_preview_Tick);
             // 
-            // timer_view_player
-            // 
-            this.timer_view_player.Interval = 3000;
-            this.timer_view_player.Tick += new System.EventHandler(this.timer_view_player_Tick);
-            // 
             // webBrowser
             // 
-            this.webBrowser.Location = new System.Drawing.Point(0, 0);
+            this.webBrowser.Location = new System.Drawing.Point(205, 375);
             this.webBrowser.MinimumSize = new System.Drawing.Size(20, 20);
             this.webBrowser.Name = "webBrowser";
             this.webBrowser.ScriptErrorsSuppressed = true;
-            this.webBrowser.Size = new System.Drawing.Size(792, 368);
+            this.webBrowser.Size = new System.Drawing.Size(917, 368);
             this.webBrowser.TabIndex = 0;
             this.webBrowser.DocumentCompleted += new System.Windows.Forms.WebBrowserDocumentCompletedEventHandler(this.webBrowser_DocumentCompleted);
             // 
@@ -91,7 +85,6 @@
             this.panel_settings.Name = "panel_settings";
             this.panel_settings.Size = new System.Drawing.Size(791, 368);
             this.panel_settings.TabIndex = 5;
-            this.panel_settings.Visible = false;
             // 
             // groupBox_maintenance
             // 
@@ -109,6 +102,7 @@
             this.dataGridView1.AllowUserToDeleteRows = false;
             this.dataGridView1.AllowUserToResizeColumns = false;
             this.dataGridView1.AllowUserToResizeRows = false;
+            this.dataGridView1.AutoSizeColumnsMode = System.Windows.Forms.DataGridViewAutoSizeColumnsMode.Fill;
             this.dataGridView1.BackgroundColor = System.Drawing.Color.White;
             this.dataGridView1.BorderStyle = System.Windows.Forms.BorderStyle.None;
             this.dataGridView1.ColumnHeadersHeightSizeMode = System.Windows.Forms.DataGridViewColumnHeadersHeightSizeMode.AutoSize;
@@ -263,17 +257,17 @@
             this.label_threshold.TabIndex = 0;
             this.label_threshold.Text = "Threshold:";
             // 
-            // timer_get_value
+            // timer_get_data
             // 
-            this.timer_get_value.Interval = 10000;
-            this.timer_get_value.Tick += new System.EventHandler(this.timer_get_value_Tick);
+            this.timer_get_data.Interval = 2000;
+            this.timer_get_data.Tick += new System.EventHandler(this.timer_get_data_Tick);
             // 
             // Main_Form
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.BackColor = System.Drawing.Color.White;
-            this.ClientSize = new System.Drawing.Size(791, 367);
+            this.ClientSize = new System.Drawing.Size(1134, 760);
             this.Controls.Add(this.panel_settings);
             this.Controls.Add(this.webBrowser);
             this.MaximizeBox = false;
@@ -295,7 +289,6 @@
 
         #endregion
         private System.Windows.Forms.Timer timer_search_preview;
-        private System.Windows.Forms.Timer timer_view_player;
         private System.Windows.Forms.WebBrowser webBrowser;
         private System.Windows.Forms.Panel panel_settings;
         private System.Windows.Forms.GroupBox groupBox_result;
@@ -313,8 +306,8 @@
         private System.Windows.Forms.GroupBox groupBox_maintenance;
         private System.Windows.Forms.DataGridView dataGridView1;
         private System.Windows.Forms.DataGridViewTextBoxColumn dataGridViewTextBoxColumn3;
-        private System.Windows.Forms.Timer timer_get_value;
         private System.Windows.Forms.DataGridViewTextBoxColumn total;
+        private System.Windows.Forms.Timer timer_get_data;
     }
 }
 
