@@ -47,6 +47,11 @@ namespace Atlas_Eyes
 
         private void Main_Form_Load(object sender, EventArgs e)
         {
+            textBox_threshold.Text = Properties.Settings.Default.threshold;
+            textBox_refreshrate.Text = Properties.Settings.Default.refresh_rate;
+            threshold = int.Parse(Properties.Settings.Default.threshold);
+            refresh_rate = int.Parse(Properties.Settings.Default.refresh_rate);
+
             if (!File.Exists(path_player))
             {
                 isNoPlayerList = true;
@@ -184,64 +189,89 @@ namespace Atlas_Eyes
         private void timer_search_preview_Tick(object sender, EventArgs e)
         {
             timer_search_preview.Stop();
-            HtmlElementCollection spans = webBrowser.Document.GetElementsByTagName("span");
 
-            foreach (HtmlElement span in spans)
+            try
             {
-                if (span.InnerHtml.ToString().Equals(player_list[current_player]))
+                HtmlElementCollection spans = webBrowser.Document.GetElementsByTagName("span");
+
+                foreach (HtmlElement span in spans)
                 {
-                    string remove_brackets = Regex.Match(span.OuterHtml.ToString(), @"\(([^)]*)\)").Groups[1].Value;
-                    string[] results = remove_brackets.Replace("'", "").Split(',');
-
-                    int count = 0;
-
-                    foreach (string result in results)
+                    if (span.InnerHtml.ToString().Equals(player_list[current_player]))
                     {
-                        count++;
+                        string remove_brackets = Regex.Match(span.OuterHtml.ToString(), @"\(([^)]*)\)").Groups[1].Value;
+                        string[] results = remove_brackets.Replace("'", "").Split(',');
 
-                        if (count == 1)
-                        {
-                            player_id = result.Replace(" ", "");
-                        } else if (count == 2)
-                        {
-                            player_name = result.Replace(" ", "");
-                        }
-                    }
-                    
-                    break;
-                }
-            }
+                        int count = 0;
 
-            HtmlElement table = webBrowser.Document.GetElementById("data");
-            var rows = table.GetElementsByTagName("tr");
-            foreach (HtmlElement row in rows)
-            {
-                int i = 0;
-                foreach (HtmlElement cell in row.GetElementsByTagName("td"))
-                {
-                    i++;
-                    string value = cell.InnerText;
-                    if (i == 2)
-                    {
-                        using (StringReader sr = new StringReader(value))
+                        foreach (string result in results)
                         {
-                            int count = 0;
-                            string line;
-                            while ((line = sr.ReadLine()) != null)
+                            count++;
+
+                            if (count == 1)
                             {
-                                count++;
+                                player_id = result.Replace(" ", "");
+                            }
+                            else if (count == 2)
+                            {
+                                player_name = result.Replace(" ", "");
+                            }
+                        }
 
-                                if (count == 2)
+                        break;
+                    }
+                }
+
+                HtmlElement table = webBrowser.Document.GetElementById("data");
+                var rows = table.GetElementsByTagName("tr");
+                foreach (HtmlElement row in rows)
+                {
+                    int i = 0;
+                    foreach (HtmlElement cell in row.GetElementsByTagName("td"))
+                    {
+                        i++;
+                        string value = cell.InnerText;
+                        if (i == 2)
+                        {
+                            using (StringReader sr = new StringReader(value))
+                            {
+                                int count = 0;
+                                string line;
+                                while ((line = sr.ReadLine()) != null)
                                 {
-                                    gpn = line;
+                                    count++;
 
-                                    timer_get_data.Start();
+                                    if (count == 2)
+                                    {
+                                        gpn = line;
 
-                                    break;
+                                        timer_get_data.Start();
+
+                                        break;
+                                    }
                                 }
                             }
                         }
                     }
+                }
+            }
+            catch (Exception err)
+            {
+                current_player++;
+                if (current_player <= player_list.Count - 1)
+                {
+                    _main_wallet = 0;
+                    _gp_wallet = 0;
+                    _total = 0;
+                    DeleteFile();
+                    webBrowser.Navigate("http://cs.ying168.bet/player/list");
+                }
+                else
+                {
+                    timer_refreshrate.Start();
+                    start_time = DateTime.Now.ToString("dd/MM/yyyy HH:mm:ss");
+                    seconds_parse = DateTime.Now.AddSeconds(refresh_rate + 2).ToString("dd/MM/yyyy HH:mm:ss");
+                    string time = DateTime.Now.ToString("HH:mm");
+                    label_fetchedtime.Text = time;
                 }
             }
         }
@@ -519,7 +549,7 @@ namespace Atlas_Eyes
 
                 if (!isMaintenance)
                 {
-                    dataGridView_result.Rows.Insert(0, player_name, _main_wallet.ToString("0.00"), _gp_wallet.ToString("0.00"), _total.ToString("0.00"));
+                    dataGridView_result.Rows.Insert(0, player_name, String.Format("{0:n}", _main_wallet), String.Format("{0:n}", _gp_wallet), String.Format("{0:n}", _total));
 
                     string backcolor = "#22967C";
                     Color backcolor_change = ColorTranslator.FromHtml(backcolor);
@@ -531,7 +561,7 @@ namespace Atlas_Eyes
                 }
                 else
                 {
-                    dataGridView_result.Rows.Insert(0, player_name, _main_wallet.ToString("0.00"), _gp_wallet.ToString("0.00"), _total.ToString("0.00"));
+                    dataGridView_result.Rows.Insert(0, player_name, String.Format("{0:n}", _main_wallet), String.Format("{0:n}", _gp_wallet), String.Format("{0:n}", _total));
 
                     string backcolor = "#EFCA58";
                     Color backcolor_change = ColorTranslator.FromHtml(backcolor);
@@ -543,8 +573,8 @@ namespace Atlas_Eyes
             {
                 label_result.Visible = false;
 
-                dataGridView_result.Rows.Insert(0, player_name, _main_wallet.ToString("0.00"), _gp_wallet.ToString("0.00"), _total.ToString("0.00"));
-                
+                dataGridView_result.Rows.Insert(0, player_name, String.Format("{0:n}", _main_wallet), String.Format("{0:n}", _gp_wallet), String.Format("{0:n}", _total));
+
                 string backcolor = "#EE3A59";
                 Color backcolor_change = ColorTranslator.FromHtml(backcolor);
                 dataGridView_result.Rows[0].DefaultCellStyle.BackColor = backcolor_change;
@@ -694,22 +724,25 @@ namespace Atlas_Eyes
 
             int n;
             bool isNumeric_threshold = int.TryParse(textBox_threshold.Text, out n);
-            bool isNumeric_refreshrate = int.TryParse(textBox_seconds.Text, out n);
+            bool isNumeric_refreshrate = int.TryParse(textBox_refreshrate.Text, out n);
 
             if (isNumeric_threshold && isNumeric_refreshrate)
             {
-                if (threshold != int.Parse(textBox_threshold.Text) || refresh_rate != int.Parse(textBox_seconds.Text))
+                if (threshold != int.Parse(textBox_threshold.Text) || refresh_rate != int.Parse(textBox_refreshrate.Text))
                 {
-                    if (limit_thredshold <= int.Parse(textBox_threshold.Text) && limit_refreshrate <= int.Parse(textBox_seconds.Text))
+                    if (limit_thredshold <= int.Parse(textBox_threshold.Text) && limit_refreshrate <= int.Parse(textBox_refreshrate.Text))
                     {
+                        Properties.Settings.Default.threshold = textBox_threshold.Text;
+                        Properties.Settings.Default.refresh_rate = textBox_refreshrate.Text;
+                        Properties.Settings.Default.Save();
                         threshold = int.Parse(textBox_threshold.Text);
-                        refresh_rate = int.Parse(textBox_seconds.Text);
+                        refresh_rate = int.Parse(textBox_refreshrate.Text);
                         MessageBox.Show("Changes applied.");
                     }
                     else
                     {
                         textBox_threshold.Text = threshold.ToString();
-                        textBox_seconds.Text = refresh_rate.ToString();
+                        textBox_refreshrate.Text = refresh_rate.ToString();
                         MessageBox.Show("Limit exceed.");
                     }
                 }
@@ -721,7 +754,7 @@ namespace Atlas_Eyes
             else
             {
                 textBox_threshold.Text = threshold.ToString();
-                textBox_seconds.Text = refresh_rate.ToString();
+                textBox_refreshrate.Text = refresh_rate.ToString();
                 MessageBox.Show("Enter numeric only.");
             }
         }

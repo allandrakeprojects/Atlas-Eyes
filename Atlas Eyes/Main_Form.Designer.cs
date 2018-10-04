@@ -55,19 +55,19 @@
             this.groupBox_result = new System.Windows.Forms.GroupBox();
             this.label_result = new System.Windows.Forms.Label();
             this.dataGridView_result = new System.Windows.Forms.DataGridView();
+            this.username = new System.Windows.Forms.DataGridViewTextBoxColumn();
+            this.main_wallet = new System.Windows.Forms.DataGridViewTextBoxColumn();
+            this.gp_wallet = new System.Windows.Forms.DataGridViewTextBoxColumn();
+            this.total = new System.Windows.Forms.DataGridViewTextBoxColumn();
             this.groupBox_settings = new System.Windows.Forms.GroupBox();
             this.button_apply = new System.Windows.Forms.Button();
-            this.textBox_seconds = new System.Windows.Forms.TextBox();
+            this.textBox_refreshrate = new System.Windows.Forms.TextBox();
             this.label_seconds = new System.Windows.Forms.Label();
             this.textBox_threshold = new System.Windows.Forms.TextBox();
             this.label_threshold = new System.Windows.Forms.Label();
             this.timer_get_data = new System.Windows.Forms.Timer(this.components);
             this.timer_refreshrate = new System.Windows.Forms.Timer(this.components);
             this.timer_reload = new System.Windows.Forms.Timer(this.components);
-            this.username = new System.Windows.Forms.DataGridViewTextBoxColumn();
-            this.main_wallet = new System.Windows.Forms.DataGridViewTextBoxColumn();
-            this.gp_wallet = new System.Windows.Forms.DataGridViewTextBoxColumn();
-            this.total = new System.Windows.Forms.DataGridViewTextBoxColumn();
             this.timer_detect = new System.Windows.Forms.Timer(this.components);
             this.panel_settings.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.pictureBox_loader)).BeginInit();
@@ -325,10 +325,46 @@
             this.dataGridView_result.CellContentClick += new System.Windows.Forms.DataGridViewCellEventHandler(this.dataGridView_result_CellContentClick);
             this.dataGridView_result.DataBindingComplete += new System.Windows.Forms.DataGridViewBindingCompleteEventHandler(this.dataGridView_result_DataBindingComplete);
             // 
+            // username
+            // 
+            dataGridViewCellStyle4.Alignment = System.Windows.Forms.DataGridViewContentAlignment.MiddleCenter;
+            this.username.DefaultCellStyle = dataGridViewCellStyle4;
+            this.username.FillWeight = 88.64321F;
+            this.username.HeaderText = "Username";
+            this.username.Name = "username";
+            this.username.ReadOnly = true;
+            // 
+            // main_wallet
+            // 
+            dataGridViewCellStyle5.Alignment = System.Windows.Forms.DataGridViewContentAlignment.MiddleRight;
+            this.main_wallet.DefaultCellStyle = dataGridViewCellStyle5;
+            this.main_wallet.FillWeight = 104.0067F;
+            this.main_wallet.HeaderText = "Main Wallet";
+            this.main_wallet.Name = "main_wallet";
+            this.main_wallet.ReadOnly = true;
+            // 
+            // gp_wallet
+            // 
+            dataGridViewCellStyle6.Alignment = System.Windows.Forms.DataGridViewContentAlignment.MiddleRight;
+            this.gp_wallet.DefaultCellStyle = dataGridViewCellStyle6;
+            this.gp_wallet.FillWeight = 107.5971F;
+            this.gp_wallet.HeaderText = "GP Wallet";
+            this.gp_wallet.Name = "gp_wallet";
+            this.gp_wallet.ReadOnly = true;
+            // 
+            // total
+            // 
+            dataGridViewCellStyle7.Alignment = System.Windows.Forms.DataGridViewContentAlignment.MiddleRight;
+            this.total.DefaultCellStyle = dataGridViewCellStyle7;
+            this.total.FillWeight = 99.75311F;
+            this.total.HeaderText = "Total";
+            this.total.Name = "total";
+            this.total.ReadOnly = true;
+            // 
             // groupBox_settings
             // 
             this.groupBox_settings.Controls.Add(this.button_apply);
-            this.groupBox_settings.Controls.Add(this.textBox_seconds);
+            this.groupBox_settings.Controls.Add(this.textBox_refreshrate);
             this.groupBox_settings.Controls.Add(this.label_seconds);
             this.groupBox_settings.Controls.Add(this.textBox_threshold);
             this.groupBox_settings.Controls.Add(this.label_threshold);
@@ -354,15 +390,15 @@
             this.button_apply.UseVisualStyleBackColor = false;
             this.button_apply.Click += new System.EventHandler(this.button_apply_Click);
             // 
-            // textBox_seconds
+            // textBox_refreshrate
             // 
-            this.textBox_seconds.Font = new System.Drawing.Font("Microsoft Sans Serif", 9.75F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.textBox_seconds.Location = new System.Drawing.Point(161, 53);
-            this.textBox_seconds.Multiline = true;
-            this.textBox_seconds.Name = "textBox_seconds";
-            this.textBox_seconds.Size = new System.Drawing.Size(83, 22);
-            this.textBox_seconds.TabIndex = 3;
-            this.textBox_seconds.Text = "30";
+            this.textBox_refreshrate.Font = new System.Drawing.Font("Microsoft Sans Serif", 9.75F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.textBox_refreshrate.Location = new System.Drawing.Point(161, 53);
+            this.textBox_refreshrate.Multiline = true;
+            this.textBox_refreshrate.Name = "textBox_refreshrate";
+            this.textBox_refreshrate.Size = new System.Drawing.Size(83, 22);
+            this.textBox_refreshrate.TabIndex = 3;
+            this.textBox_refreshrate.Text = "30";
             // 
             // label_seconds
             // 
@@ -408,42 +444,6 @@
             // 
             this.timer_reload.Interval = 10000;
             this.timer_reload.Tick += new System.EventHandler(this.timer_reload_Tick);
-            // 
-            // username
-            // 
-            dataGridViewCellStyle4.Alignment = System.Windows.Forms.DataGridViewContentAlignment.MiddleCenter;
-            this.username.DefaultCellStyle = dataGridViewCellStyle4;
-            this.username.FillWeight = 88.64321F;
-            this.username.HeaderText = "Username";
-            this.username.Name = "username";
-            this.username.ReadOnly = true;
-            // 
-            // main_wallet
-            // 
-            dataGridViewCellStyle5.Alignment = System.Windows.Forms.DataGridViewContentAlignment.MiddleRight;
-            this.main_wallet.DefaultCellStyle = dataGridViewCellStyle5;
-            this.main_wallet.FillWeight = 104.0067F;
-            this.main_wallet.HeaderText = "Main Wallet";
-            this.main_wallet.Name = "main_wallet";
-            this.main_wallet.ReadOnly = true;
-            // 
-            // gp_wallet
-            // 
-            dataGridViewCellStyle6.Alignment = System.Windows.Forms.DataGridViewContentAlignment.MiddleRight;
-            this.gp_wallet.DefaultCellStyle = dataGridViewCellStyle6;
-            this.gp_wallet.FillWeight = 107.5971F;
-            this.gp_wallet.HeaderText = "GP Wallet";
-            this.gp_wallet.Name = "gp_wallet";
-            this.gp_wallet.ReadOnly = true;
-            // 
-            // total
-            // 
-            dataGridViewCellStyle7.Alignment = System.Windows.Forms.DataGridViewContentAlignment.MiddleRight;
-            this.total.DefaultCellStyle = dataGridViewCellStyle7;
-            this.total.FillWeight = 99.75311F;
-            this.total.HeaderText = "Total";
-            this.total.Name = "total";
-            this.total.ReadOnly = true;
             // 
             // timer_detect
             // 
@@ -491,7 +491,7 @@
         private System.Windows.Forms.GroupBox groupBox_result;
         private System.Windows.Forms.DataGridView dataGridView_result;
         private System.Windows.Forms.GroupBox groupBox_settings;
-        private System.Windows.Forms.TextBox textBox_seconds;
+        private System.Windows.Forms.TextBox textBox_refreshrate;
         private System.Windows.Forms.Label label_seconds;
         private System.Windows.Forms.TextBox textBox_threshold;
         private System.Windows.Forms.Label label_threshold;
