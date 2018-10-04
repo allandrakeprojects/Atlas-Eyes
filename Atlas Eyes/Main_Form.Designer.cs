@@ -61,7 +61,7 @@
             this.total = new System.Windows.Forms.DataGridViewTextBoxColumn();
             this.groupBox_settings = new System.Windows.Forms.GroupBox();
             this.button_apply = new System.Windows.Forms.Button();
-            this.textBox_refreshrate = new System.Windows.Forms.TextBox();
+            this.textBox_seconds = new System.Windows.Forms.TextBox();
             this.label_seconds = new System.Windows.Forms.Label();
             this.textBox_threshold = new System.Windows.Forms.TextBox();
             this.label_threshold = new System.Windows.Forms.Label();
@@ -154,9 +154,9 @@
             this.button_save.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
             this.button_save.Font = new System.Drawing.Font("Microsoft Sans Serif", 9F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
             this.button_save.ForeColor = System.Drawing.Color.White;
-            this.button_save.Location = new System.Drawing.Point(60, 258);
+            this.button_save.Location = new System.Drawing.Point(57, 259);
             this.button_save.Name = "button_save";
-            this.button_save.Size = new System.Drawing.Size(83, 26);
+            this.button_save.Size = new System.Drawing.Size(90, 25);
             this.button_save.TabIndex = 7;
             this.button_save.Text = "SAVE";
             this.button_save.UseVisualStyleBackColor = false;
@@ -177,11 +177,11 @@
             // 
             this.label_timer.Font = new System.Drawing.Font("Microsoft Sans Serif", 15F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
             this.label_timer.ForeColor = System.Drawing.Color.FromArgb(((int)(((byte)(222)))), ((int)(((byte)(30)))), ((int)(((byte)(112)))));
-            this.label_timer.Location = new System.Drawing.Point(917, 10);
+            this.label_timer.Location = new System.Drawing.Point(880, 10);
             this.label_timer.Name = "label_timer";
-            this.label_timer.Size = new System.Drawing.Size(43, 34);
+            this.label_timer.Size = new System.Drawing.Size(78, 34);
             this.label_timer.TabIndex = 9;
-            this.label_timer.TextAlign = System.Drawing.ContentAlignment.MiddleCenter;
+            this.label_timer.TextAlign = System.Drawing.ContentAlignment.MiddleRight;
             this.label_timer.Visible = false;
             // 
             // label_fetchedtime
@@ -309,8 +309,8 @@
             dataGridViewCellStyle8.BackColor = System.Drawing.SystemColors.Window;
             dataGridViewCellStyle8.Font = new System.Drawing.Font("Microsoft Sans Serif", 9F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
             dataGridViewCellStyle8.ForeColor = System.Drawing.SystemColors.ControlText;
-            dataGridViewCellStyle8.SelectionBackColor = System.Drawing.Color.FromArgb(((int)(((byte)(222)))), ((int)(((byte)(30)))), ((int)(((byte)(112)))));
-            dataGridViewCellStyle8.SelectionForeColor = System.Drawing.Color.White;
+            dataGridViewCellStyle8.SelectionBackColor = System.Drawing.Color.White;
+            dataGridViewCellStyle8.SelectionForeColor = System.Drawing.Color.Black;
             dataGridViewCellStyle8.WrapMode = System.Windows.Forms.DataGridViewTriState.False;
             this.dataGridView_result.DefaultCellStyle = dataGridViewCellStyle8;
             this.dataGridView_result.Dock = System.Windows.Forms.DockStyle.Fill;
@@ -324,6 +324,7 @@
             this.dataGridView_result.TabIndex = 2;
             this.dataGridView_result.CellContentClick += new System.Windows.Forms.DataGridViewCellEventHandler(this.dataGridView_result_CellContentClick);
             this.dataGridView_result.DataBindingComplete += new System.Windows.Forms.DataGridViewBindingCompleteEventHandler(this.dataGridView_result_DataBindingComplete);
+            this.dataGridView_result.SortCompare += new System.Windows.Forms.DataGridViewSortCompareEventHandler(this.dataGridView_result_SortCompare);
             // 
             // username
             // 
@@ -364,7 +365,7 @@
             // groupBox_settings
             // 
             this.groupBox_settings.Controls.Add(this.button_apply);
-            this.groupBox_settings.Controls.Add(this.textBox_refreshrate);
+            this.groupBox_settings.Controls.Add(this.textBox_seconds);
             this.groupBox_settings.Controls.Add(this.label_seconds);
             this.groupBox_settings.Controls.Add(this.textBox_threshold);
             this.groupBox_settings.Controls.Add(this.label_threshold);
@@ -382,29 +383,28 @@
             this.button_apply.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
             this.button_apply.Font = new System.Drawing.Font("Microsoft Sans Serif", 9F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
             this.button_apply.ForeColor = System.Drawing.Color.White;
-            this.button_apply.Location = new System.Drawing.Point(161, 81);
+            this.button_apply.Location = new System.Drawing.Point(164, 93);
             this.button_apply.Name = "button_apply";
-            this.button_apply.Size = new System.Drawing.Size(83, 25);
+            this.button_apply.Size = new System.Drawing.Size(90, 25);
             this.button_apply.TabIndex = 4;
             this.button_apply.Text = "APPLY";
             this.button_apply.UseVisualStyleBackColor = false;
             this.button_apply.Click += new System.EventHandler(this.button_apply_Click);
             // 
-            // textBox_refreshrate
+            // textBox_seconds
             // 
-            this.textBox_refreshrate.Font = new System.Drawing.Font("Microsoft Sans Serif", 9.75F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.textBox_refreshrate.Location = new System.Drawing.Point(161, 53);
-            this.textBox_refreshrate.Multiline = true;
-            this.textBox_refreshrate.Name = "textBox_refreshrate";
-            this.textBox_refreshrate.Size = new System.Drawing.Size(83, 22);
-            this.textBox_refreshrate.TabIndex = 3;
-            this.textBox_refreshrate.Text = "30";
+            this.textBox_seconds.Font = new System.Drawing.Font("Microsoft Sans Serif", 9.75F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.textBox_seconds.Location = new System.Drawing.Point(164, 65);
+            this.textBox_seconds.Multiline = true;
+            this.textBox_seconds.Name = "textBox_seconds";
+            this.textBox_seconds.Size = new System.Drawing.Size(90, 22);
+            this.textBox_seconds.TabIndex = 3;
             // 
             // label_seconds
             // 
             this.label_seconds.AutoSize = true;
             this.label_seconds.Font = new System.Drawing.Font("Microsoft Sans Serif", 9F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.label_seconds.Location = new System.Drawing.Point(8, 56);
+            this.label_seconds.Location = new System.Drawing.Point(13, 68);
             this.label_seconds.Name = "label_seconds";
             this.label_seconds.Size = new System.Drawing.Size(147, 15);
             this.label_seconds.TabIndex = 2;
@@ -413,18 +413,17 @@
             // textBox_threshold
             // 
             this.textBox_threshold.Font = new System.Drawing.Font("Microsoft Sans Serif", 9F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.textBox_threshold.Location = new System.Drawing.Point(162, 24);
+            this.textBox_threshold.Location = new System.Drawing.Point(165, 36);
             this.textBox_threshold.Multiline = true;
             this.textBox_threshold.Name = "textBox_threshold";
-            this.textBox_threshold.Size = new System.Drawing.Size(82, 23);
+            this.textBox_threshold.Size = new System.Drawing.Size(89, 23);
             this.textBox_threshold.TabIndex = 1;
-            this.textBox_threshold.Text = "1000";
             // 
             // label_threshold
             // 
             this.label_threshold.AutoSize = true;
             this.label_threshold.Font = new System.Drawing.Font("Microsoft Sans Serif", 9F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.label_threshold.Location = new System.Drawing.Point(7, 30);
+            this.label_threshold.Location = new System.Drawing.Point(13, 42);
             this.label_threshold.Name = "label_threshold";
             this.label_threshold.Size = new System.Drawing.Size(65, 15);
             this.label_threshold.TabIndex = 0;
@@ -447,7 +446,7 @@
             // 
             // timer_detect
             // 
-            this.timer_detect.Interval = 60000;
+            this.timer_detect.Interval = 30000;
             this.timer_detect.Tick += new System.EventHandler(this.timer_detect_Tick);
             // 
             // Main_Form
@@ -465,7 +464,7 @@
             this.MinimumSize = new System.Drawing.Size(992, 412);
             this.Name = "Main_Form";
             this.StartPosition = System.Windows.Forms.FormStartPosition.CenterScreen;
-            this.Text = "Atlas Eyes";
+            this.Text = "FY Atlas Eyes";
             this.FormClosing += new System.Windows.Forms.FormClosingEventHandler(this.Main_Form_FormClosing);
             this.Load += new System.EventHandler(this.Main_Form_Load);
             this.panel_settings.ResumeLayout(false);
@@ -491,7 +490,7 @@
         private System.Windows.Forms.GroupBox groupBox_result;
         private System.Windows.Forms.DataGridView dataGridView_result;
         private System.Windows.Forms.GroupBox groupBox_settings;
-        private System.Windows.Forms.TextBox textBox_refreshrate;
+        private System.Windows.Forms.TextBox textBox_seconds;
         private System.Windows.Forms.Label label_seconds;
         private System.Windows.Forms.TextBox textBox_threshold;
         private System.Windows.Forms.Label label_threshold;
@@ -510,12 +509,12 @@
         private System.Windows.Forms.GroupBox groupBox_player;
         private System.Windows.Forms.Timer timer_reload;
         private System.Windows.Forms.Label label_fetchedtime_1;
-        private System.Windows.Forms.DataGridViewTextBoxColumn dataGridViewTextBoxColumn3;
         private System.Windows.Forms.DataGridViewTextBoxColumn username;
         private System.Windows.Forms.DataGridViewTextBoxColumn main_wallet;
         private System.Windows.Forms.DataGridViewTextBoxColumn gp_wallet;
         private System.Windows.Forms.DataGridViewTextBoxColumn total;
         private System.Windows.Forms.Timer timer_detect;
+        private System.Windows.Forms.DataGridViewTextBoxColumn dataGridViewTextBoxColumn3;
     }
 }
 

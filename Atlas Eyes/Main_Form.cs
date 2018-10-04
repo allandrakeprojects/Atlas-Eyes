@@ -1,6 +1,7 @@
 ﻿using ChoETL;
 using System;
 using System.Collections.Generic;
+using System.ComponentModel;
 using System.Drawing;
 using System.Globalization;
 using System.IO;
@@ -38,7 +39,7 @@ namespace Atlas_Eyes
         private string seconds_parse;
         private bool isNoPlayerList = false;
         private bool isOpened = true;
-        private bool isGetDataEntered = false;
+        private bool isMaintenanceInserted = false;
 
         public Main_Form()
         {
@@ -48,7 +49,7 @@ namespace Atlas_Eyes
         private void Main_Form_Load(object sender, EventArgs e)
         {
             textBox_threshold.Text = Properties.Settings.Default.threshold;
-            textBox_refreshrate.Text = Properties.Settings.Default.refresh_rate;
+            textBox_seconds.Text = Properties.Settings.Default.refresh_rate;
             threshold = int.Parse(Properties.Settings.Default.threshold);
             refresh_rate = int.Parse(Properties.Settings.Default.refresh_rate);
 
@@ -58,20 +59,27 @@ namespace Atlas_Eyes
             }
             else
             {
-                richTextBox_player.Text = File.ReadAllText(path_player);
-
-                player_list.Clear();
-
-                string line;
-                StreamReader streamReader = new StreamReader(path_player);
-                while ((line = streamReader.ReadLine()) != null)
+                if (new FileInfo(path_player).Length == 0)
                 {
-                    if (line.Length > 0)
-                    {
-                        player_list.Add(line);
-                    }
+                    isNoPlayerList = true;
                 }
-                streamReader.Close();
+                else
+                {
+                    richTextBox_player.Text = File.ReadAllText(path_player);
+
+                    player_list.Clear();
+
+                    string line;
+                    StreamReader streamReader = new StreamReader(path_player);
+                    while ((line = streamReader.ReadLine()) != null)
+                    {
+                        if (line.Length > 0)
+                        {
+                            player_list.Add(line.Trim());
+                        }
+                    }
+                    streamReader.Close();
+                }
             }
 
             DeleteFile();
@@ -157,6 +165,8 @@ namespace Atlas_Eyes
                                 groupBox_settings.Enabled = false;
                                 groupBox_maintenance.Enabled = false;
                                 groupBox_result.Enabled = false;
+                                label_fetchedtime_1.Enabled = false;
+                                label_fetchedtime.Enabled = false;
                                 webBrowser.Navigate("http://cs.ying168.bet/player/list");
                                 MessageBox.Show("Please provide player username.");
                             }
@@ -256,6 +266,18 @@ namespace Atlas_Eyes
             }
             catch (Exception err)
             {
+                label_result.Visible = false;
+
+                dataGridView_result.Rows.Insert(0, player_list[current_player], "-", "-", "-");
+
+                string backcolor = "#EE3A59";
+                Color backcolor_change = ColorTranslator.FromHtml(backcolor);
+                dataGridView_result.Rows[0].DefaultCellStyle.BackColor = backcolor_change;
+                dataGridView_result.Rows[0].DefaultCellStyle.ForeColor = Color.Black;
+
+                dataGridView_result.Sort(dataGridView_result.Columns["total"], ListSortDirection.Descending);
+                dataGridView_result.ClearSelection();
+
                 current_player++;
                 if (current_player <= player_list.Count - 1)
                 {
@@ -278,7 +300,6 @@ namespace Atlas_Eyes
 
         private async void timer_get_data_TickAsync(object sender, EventArgs e)
         {
-            isGetDataEntered = true;
             timer_detect.Stop();
 
             timer_get_data.Stop();
@@ -354,7 +375,7 @@ namespace Atlas_Eyes
                     using (var p = ChoJSONReader.LoadText(final_result).WithJSONPath("$...data"))
                     {
                         csv.Write(p.Select(i => new {
-                            Header_Test_Header = i.id + i.flag
+                            Header_Test_Header = i.id + i.flag + i.nb
                         }));
                     }
                 }
@@ -413,95 +434,182 @@ namespace Atlas_Eyes
                     if (result != "Header_Test_Header")
                     {
                         char last = result[result.Length - 1];
-                        if (last == '1')
+                        char second_last = result[result.Length - 2];
+                        if (last == '0')
                         {
-                            string final_result = result.Remove(result.Length - 1);
-
-                            if (final_result != "10000")
+                            if (second_last == '1')
                             {
-                                var cookies = FullWebBrowserCookie.GetCookieInternal(webBrowser.Url, false);
-                                WebClient wc = new WebClient();
-                                wc.Headers.Add("Cookie: " + cookies);
-                                wc.Encoding = Encoding.UTF8;
-                                wc.Headers.Add("Content-Type", "application/x-www-form-urlencoded");
-                                string result_download = await wc.DownloadStringTaskAsync("http://cs.ying168.bet/kzb/gp/v1/balance?gpid=" + final_result + "&playerid=" + player_id + "&playername=" + player_name + "&gpn=3425819" + gpn);
-                                //MessageBox.Show(final_result + " ------ " + result_download);
-                                try
-                                {
-                                    using (var csv = new ChoCSVWriter(path_gpbalancetemp).WithFirstLineHeader())
-                                    {
-                                        using (var p = ChoJSONReader.LoadText(result_download).WithJSONPath("$...data"))
-                                        {
-                                            csv.Write(p.Select(i => new
-                                            {
-                                                Header_Test_Header = i.val
-                                            }));
-                                        }
-                                    }
+                                string final_result = result.Remove(result.Length - 2);
 
-                                    string line;
-                                    StreamReader streamReader = new StreamReader(path_gpbalancetemp);
-                                    while ((line = streamReader.ReadLine()) != null)
+                                if (final_result != "10000")
+                                {
+                                    var cookies = FullWebBrowserCookie.GetCookieInternal(webBrowser.Url, false);
+                                    WebClient wc = new WebClient();
+                                    wc.Headers.Add("Cookie: " + cookies);
+                                    wc.Encoding = Encoding.UTF8;
+                                    wc.Headers.Add("Content-Type", "application/x-www-form-urlencoded");
+                                    string result_download = await wc.DownloadStringTaskAsync("http://cs.ying168.bet/kzb/gp/v1/balance?gpid=" + final_result + "&playerid=" + player_id + "&playername=" + player_name + "&gpn=3425819" + gpn);
+                                    //MessageBox.Show(final_result + " ------ " + result_download);
+                                    try
                                     {
-                                        if (!line.Contains("Header_Test_Header"))
+                                        using (var csv = new ChoCSVWriter(path_gpbalancetemp).WithFirstLineHeader())
                                         {
-                                            //MessageBox.Show(line);
-                                            StreamWriter sw = new StreamWriter(path_gpbalance, true, Encoding.UTF8);
-                                            sw.WriteLine(line);
-                                            sw.Close();
+                                            using (var p = ChoJSONReader.LoadText(result_download).WithJSONPath("$...data"))
+                                            {
+                                                csv.Write(p.Select(i => new
+                                                {
+                                                    Header_Test_Header = i.val
+                                                }));
+                                            }
+                                        }
+
+                                        string line;
+                                        StreamReader streamReader = new StreamReader(path_gpbalancetemp);
+                                        while ((line = streamReader.ReadLine()) != null)
+                                        {
+                                            if (!line.Contains("Header_Test_Header"))
+                                            {
+                                                //MessageBox.Show(line);
+                                                StreamWriter sw = new StreamWriter(path_gpbalance, true, Encoding.UTF8);
+                                                sw.WriteLine(line);
+                                                sw.Close();
+                                            }
+                                        }
+                                        streamReader.Close();
+                                    }
+                                    catch (Exception err)
+                                    {
+                                        //MessageBox.Show(err.ToString());
+                                    }
+                                }
+                            }
+                            else
+                            {
+                                isMaintenance = true;
+                                string final_result = result.Remove(result.Length - 2);
+                                bool isGet = false;
+                                string line;
+                                StreamReader streamReader = new StreamReader(path_gpname);
+                                while ((line = streamReader.ReadLine()) != null)
+                                {
+                                    if (line != "Header_Test_Header")
+                                    {
+                                        int count = 0;
+                                        string[] words = line.Split("*|*");
+                                        foreach (string word in words)
+                                        {
+                                            count++;
+
+                                            if (count == 1)
+                                            {
+                                                if (final_result == word)
+                                                {
+                                                    isGet = true;
+                                                }
+                                            }
+                                            else if (count == 2)
+                                            {
+                                                if (isGet)
+                                                {
+                                                    isGet = false;
+
+                                                    foreach (DataGridViewRow row in dataGridView_maintenance.Rows)
+                                                    {
+                                                        foreach (DataGridViewCell cell in row.Cells)
+                                                        {
+                                                            string value = cell.Value.ToString();
+
+                                                            if (word != value)
+                                                            {
+                                                                isMaintenanceInserted = true;
+                                                                dataGridView_maintenance.Rows.Add(word);
+                                                            }
+                                                            else
+                                                            {
+                                                                isMaintenanceInserted = true;
+                                                            }
+                                                        }
+                                                    }
+
+                                                    if (!isMaintenanceInserted)
+                                                    {
+                                                        dataGridView_maintenance.Rows.Add(word);
+                                                    }
+                                                }
+                                            }
                                         }
                                     }
-                                    streamReader.Close();
                                 }
-                                catch (Exception err)
-                                {
-                                    //MessageBox.Show(err.ToString());
-                                }
+                                streamReader.Close();
+
+                                dataGridView_maintenance.ClearSelection();
+                                label_maintenance.Visible = false;
                             }
                         }
                         else
                         {
-                            isMaintenance = true;
-                            string final_result = result.Remove(result.Length - 1);
-
-                            dataGridView_maintenance.Rows.Clear();
-                            dataGridView_maintenance.Refresh();
-
-                            bool isGet = false;
-                            string line;
-                            StreamReader streamReader = new StreamReader(path_gpname);
-                            while ((line = streamReader.ReadLine()) != null)
+                            if (second_last == '2')
                             {
-                                if (line != "Header_Test_Header")
+                                isMaintenance = true;
+                                string final_result = result.Remove(result.Length - 2);
+                                bool isGet = false;
+                                string line;
+                                StreamReader streamReader = new StreamReader(path_gpname);
+                                while ((line = streamReader.ReadLine()) != null)
                                 {
-                                    int count = 0;
-                                    string[] words = line.Split("*|*");
-                                    foreach (string word in words)
+                                    if (line != "Header_Test_Header")
                                     {
-                                        count++;
+                                        int count = 0;
+                                        string[] words = line.Split("*|*");
+                                        foreach (string word in words)
+                                        {
+                                            count++;
 
-                                        if (count == 1)
-                                        {
-                                            if (final_result == word)
+                                            if (count == 1)
                                             {
-                                                isGet = true;
+                                                if (final_result == word)
+                                                {
+                                                    isGet = true;
+                                                }
                                             }
-                                        }
-                                        else if (count == 2)
-                                        {
-                                            if (isGet)
+                                            else if (count == 2)
                                             {
-                                                isGet = false;
-                                                dataGridView_maintenance.Rows.Add(word);
+                                                if (isGet)
+                                                {
+                                                    isGet = false;
+
+                                                    foreach (DataGridViewRow row in dataGridView_maintenance.Rows)
+                                                    {
+                                                        foreach (DataGridViewCell cell in row.Cells)
+                                                        {
+                                                            string value = cell.Value.ToString();
+
+                                                            if (word != value)
+                                                            {
+                                                                isMaintenanceInserted = true;
+                                                                dataGridView_maintenance.Rows.Add(word);
+                                                            }
+                                                            else
+                                                            {
+                                                                isMaintenanceInserted = true;
+                                                            }
+                                                        }
+                                                    }
+
+                                                    if (!isMaintenanceInserted)
+                                                    {
+                                                        dataGridView_maintenance.Rows.Add(word);
+                                                    }
+                                                }
                                             }
                                         }
                                     }
                                 }
-                            }
-                            streamReader.Close();
+                                streamReader.Close();
 
-                            dataGridView_maintenance.ClearSelection();
-                            label_maintenance.Visible = false;
+                                dataGridView_maintenance.ClearSelection();
+                                label_maintenance.Visible = false;
+                            }
                         }
                     }
                 }
@@ -539,16 +647,18 @@ namespace Atlas_Eyes
                     }
                 }
                 streamReader_total.Close();
-            }           
+            }
 
             //MessageBox.Show("MAIN WALLET: " + _main_wallet.ToString("0.##") + "\nGP WALLET: " + _gp_wallet.ToString("0.##") + "\n" + "TOTAL: " + _total.ToString("0.##"));
 
+            label_result.Visible = false;
+
             if (threshold <= _total)
             {
-                label_result.Visible = false;
-
                 if (!isMaintenance)
                 {
+                    isMaintenance = false;
+
                     dataGridView_result.Rows.Insert(0, player_name, String.Format("{0:n}", _main_wallet), String.Format("{0:n}", _gp_wallet), String.Format("{0:n}", _total));
 
                     string backcolor = "#22967C";
@@ -571,17 +681,31 @@ namespace Atlas_Eyes
             }
             else
             {
-                label_result.Visible = false;
+                if (!isMaintenance)
+                {
+                    isMaintenance = false;
 
-                dataGridView_result.Rows.Insert(0, player_name, String.Format("{0:n}", _main_wallet), String.Format("{0:n}", _gp_wallet), String.Format("{0:n}", _total));
+                    dataGridView_result.Rows.Insert(0, player_name, String.Format("{0:n}", _main_wallet), String.Format("{0:n}", _gp_wallet), String.Format("{0:n}", _total));
 
-                string backcolor = "#EE3A59";
-                Color backcolor_change = ColorTranslator.FromHtml(backcolor);
-                dataGridView_result.Rows[0].DefaultCellStyle.BackColor = backcolor_change;
-                dataGridView_result.Rows[0].DefaultCellStyle.ForeColor = Color.Black;
+                    string backcolor = "#EE3A59";
+                    Color backcolor_change = ColorTranslator.FromHtml(backcolor);
+                    dataGridView_result.Rows[0].DefaultCellStyle.BackColor = backcolor_change;
+                    dataGridView_result.Rows[0].DefaultCellStyle.ForeColor = Color.Black;
+                }
+                else
+                {
+                    dataGridView_result.Rows.Insert(0, player_name, String.Format("{0:n}", _main_wallet), String.Format("{0:n}", _gp_wallet), String.Format("{0:n}", _total));
+
+                    string backcolor = "#EFCA58";
+                    Color backcolor_change = ColorTranslator.FromHtml(backcolor);
+                    dataGridView_result.Rows[0].DefaultCellStyle.BackColor = backcolor_change;
+                    dataGridView_result.Rows[0].DefaultCellStyle.ForeColor = Color.Black;
+                }
             }
 
+            dataGridView_result.Sort(dataGridView_result.Columns["total"], ListSortDirection.Descending);
             dataGridView_result.ClearSelection();
+
             current_player++;
             if (current_player <= player_list.Count - 1)
             {
@@ -617,94 +741,71 @@ namespace Atlas_Eyes
 
             TimeSpan delta = DateTime.Now - start;
             TimeSpan timeRemaining = spinTime - delta;
-            label_timer.Text = timeRemaining.Seconds + "";
 
-            if (label_timer.Text == "0")
+            if (timeRemaining.Minutes != 0)
             {
-                dataGridView_result.Rows.Clear();
-                dataGridView_result.Refresh();
-
-                dataGridView_maintenance.Rows.Clear();
-                dataGridView_maintenance.Refresh();
-
-
-                player_list.Clear();
-
-                string line;
-                StreamReader streamReader = new StreamReader(path_player);
-                while ((line = streamReader.ReadLine()) != null)
+                if (timeRemaining.Seconds == 0)
                 {
-                    if (line.Length > 0)
+                    label_timer.Text = timeRemaining.Minutes + ":" + timeRemaining.Seconds + "0";
+                }
+                else
+                {
+                    if (timeRemaining.Seconds.ToString().Length == 1)
                     {
-                        player_list.Add(line);
+                        label_timer.Text = timeRemaining.Minutes + ":0" + timeRemaining.Seconds;
+                    }
+                    else
+                    {
+                        label_timer.Text = timeRemaining.Minutes + ":" + timeRemaining.Seconds;
                     }
                 }
-                streamReader.Close();
-
-                _main_wallet = 0;
-                _gp_wallet = 0;
-                _total = 0;
-                label_timer.Visible = false;
-                label_timer.Text = "";
-                pictureBox_loader.Visible = true;
-                timer_refreshrate.Stop();
-                current_player = 0;
-                DeleteFile();
-                webBrowser.Navigate("http://cs.ying168.bet/player/list");
-            }
-            else
-            {
+                
                 pictureBox_loader.Visible = false;
                 label_timer.Visible = true;
             }
-        }
+            else
+            {                
+                if (label_timer.Text == "1")
+                {
+                    _main_wallet = 0;
+                    _gp_wallet = 0;
+                    _total = 0;
+                    label_timer.Visible = false;
+                    label_timer.Text = "";
+                    isMaintenanceInserted = false;
+                    pictureBox_loader.Visible = true;
+                    timer_refreshrate.Stop();
+                    current_player = 0;
 
+                    dataGridView_result.Rows.Clear();
+                    dataGridView_result.Refresh();
 
+                    dataGridView_maintenance.Rows.Clear();
+                    dataGridView_maintenance.Refresh();
 
+                    player_list.Clear();
 
+                    string line;
+                    StreamReader streamReader = new StreamReader(path_player);
+                    while ((line = streamReader.ReadLine()) != null)
+                    {
+                        if (line.Length > 0)
+                        {
+                            player_list.Add(line.Trim());
+                        }
+                    }
+                    streamReader.Close();
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-        public static Decimal ExtractDecimalFromString(string str)
-        {
-
-            Regex digits = new Regex(@"^\D*?((-?(\d+(\.\d+)?))|(-?\.\d+)).*");
-            Match mx = digits.Match(str);
-            //Console.WriteLine("Input {0} - Digits {1} {2}", str, mx.Success, mx.Groups);
-
-            return mx.Success ? Convert.ToDecimal(mx.Groups[1].Value) : 0;
+                    DeleteFile();
+                    webBrowser.Navigate("http://cs.ying168.bet/player/list");
+                }
+                else
+                {
+                    label_timer.Text = timeRemaining.Seconds.ToString();
+                    pictureBox_loader.Visible = false;
+                    label_timer.Visible = true;
+                }
+            }
         }
 
         private void dataGridView_result_DataBindingComplete(object sender, DataGridViewBindingCompleteEventArgs e)
@@ -724,25 +825,25 @@ namespace Atlas_Eyes
 
             int n;
             bool isNumeric_threshold = int.TryParse(textBox_threshold.Text, out n);
-            bool isNumeric_refreshrate = int.TryParse(textBox_refreshrate.Text, out n);
+            bool isNumeric_refreshrate = int.TryParse(textBox_seconds.Text, out n);
 
             if (isNumeric_threshold && isNumeric_refreshrate)
             {
-                if (threshold != int.Parse(textBox_threshold.Text) || refresh_rate != int.Parse(textBox_refreshrate.Text))
+                if (threshold != int.Parse(textBox_threshold.Text) || refresh_rate != int.Parse(textBox_seconds.Text))
                 {
-                    if (limit_thredshold <= int.Parse(textBox_threshold.Text) && limit_refreshrate <= int.Parse(textBox_refreshrate.Text))
+                    if (limit_thredshold <= int.Parse(textBox_threshold.Text) && limit_refreshrate <= int.Parse(textBox_seconds.Text))
                     {
                         Properties.Settings.Default.threshold = textBox_threshold.Text;
-                        Properties.Settings.Default.refresh_rate = textBox_refreshrate.Text;
+                        Properties.Settings.Default.refresh_rate = textBox_seconds.Text;
                         Properties.Settings.Default.Save();
                         threshold = int.Parse(textBox_threshold.Text);
-                        refresh_rate = int.Parse(textBox_refreshrate.Text);
+                        refresh_rate = int.Parse(textBox_seconds.Text);
                         MessageBox.Show("Changes applied.");
                     }
                     else
                     {
                         textBox_threshold.Text = threshold.ToString();
-                        textBox_refreshrate.Text = refresh_rate.ToString();
+                        textBox_seconds.Text = refresh_rate.ToString();
                         MessageBox.Show("Limit exceed.");
                     }
                 }
@@ -754,7 +855,7 @@ namespace Atlas_Eyes
             else
             {
                 textBox_threshold.Text = threshold.ToString();
-                textBox_refreshrate.Text = refresh_rate.ToString();
+                textBox_seconds.Text = refresh_rate.ToString();
                 MessageBox.Show("Enter numeric only.");
             }
         }
@@ -763,6 +864,7 @@ namespace Atlas_Eyes
         {
             if (richTextBox_player.Text != "")
             {
+                richTextBox_player.Text = Regex.Replace(richTextBox_player.Text, @"^\s*$(\n|\r|\r\n)", "", RegexOptions.Multiline);
                 richTextBox_player.SaveFile(path_player, RichTextBoxStreamType.PlainText);
 
                 var contents = File.ReadAllLines(path_player);
@@ -770,7 +872,7 @@ namespace Atlas_Eyes
                 File.WriteAllLines(path_player, contents);
 
                 richTextBox_player.Text = "";
-                richTextBox_player.Text = File.ReadAllText(path_player);
+                richTextBox_player.Text = File.ReadAllText(path_player).Trim();
 
                 if (isNoPlayerList)
                 {
@@ -781,6 +883,8 @@ namespace Atlas_Eyes
                     groupBox_settings.Enabled = true;
                     groupBox_maintenance.Enabled = true;
                     groupBox_result.Enabled = true;
+                    label_fetchedtime_1.Enabled = true;
+                    label_fetchedtime.Enabled = true;
 
                     string line;
                     StreamReader streamReader = new StreamReader(path_player);
@@ -788,12 +892,12 @@ namespace Atlas_Eyes
                     {
                         if (line.Length > 0)
                         {
-                            player_list.Add(line);
+                            player_list.Add(line.Trim());
                         }
                     }
                     streamReader.Close();
-
-
+                    
+                    timer_reload.Stop();
                     webBrowser.Navigate("http://cs.ying168.bet/player/list");
                 }
 
@@ -836,12 +940,8 @@ namespace Atlas_Eyes
 
         private void timer_detect_Tick(object sender, EventArgs e)
         {
-            if (isGetDataEntered)
-            {
-                timer_detect.Stop();
-                isGetDataEntered = false;
-                webBrowser.Navigate("http://cs.ying168.bet/player/list");
-            }
+            timer_detect.Stop();
+            webBrowser.Navigate("http://cs.ying168.bet/player/list");
         }
 
         private void Main_Form_FormClosing(object sender, FormClosingEventArgs e)
@@ -851,6 +951,23 @@ namespace Atlas_Eyes
             {
                 e.Cancel = true;
             }
+        }
+
+        private void dataGridView_result_SortCompare(object sender, DataGridViewSortCompareEventArgs e)
+        {
+            try
+            {
+                e.SortResult = Compare(e.CellValue1.ToString(), e.CellValue2.ToString());
+            }
+            catch (Exception err)
+            {
+                //MessageBox.Show(err.ToString());
+            }
+        }
+
+        private int Compare(string a, string b)
+        {
+            return decimal.Parse(a).CompareTo(decimal.Parse(b));
         }
     }
 }
