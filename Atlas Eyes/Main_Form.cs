@@ -648,9 +648,7 @@ namespace Atlas_Eyes
                 }
                 streamReader_total.Close();
             }
-
-            //MessageBox.Show("MAIN WALLET: " + _main_wallet.ToString("0.##") + "\nGP WALLET: " + _gp_wallet.ToString("0.##") + "\n" + "TOTAL: " + _total.ToString("0.##"));
-
+            
             label_result.Visible = false;
 
             if (threshold <= _total)
@@ -905,26 +903,8 @@ namespace Atlas_Eyes
             }
             else
             {
-                MessageBox.Show("Required to have player names.");
+                MessageBox.Show("Required to have player username.");
             }
-        }
-
-        private void richTextBox_player_TextChanged(object sender, EventArgs e)
-        {
-            //string txt = string.Empty;
-            //txt = richTextBox_player.Text;
-            //if (txt != string.Empty)
-            //{
-            //    if (txt.Length % 20 == 0)
-            //    {
-            //        richTextBox_player.AppendText(Environment.NewLine);
-            //    }
-            //}
-        }
-
-        private void button1_Click(object sender, EventArgs e)
-        {
-            MessageBox.Show(player_list[0] + " --- " + player_list.Count);
         }
 
         private void timer_reload_Tick(object sender, EventArgs e)
