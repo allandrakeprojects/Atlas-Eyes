@@ -29,17 +29,18 @@ namespace Atlas_Eyes
         private decimal _gp_wallet;
         private int threshold = 1000;
         private int refresh_rate = 30;
-        string path_gp = Path.GetTempPath() + "/ae_gameprovider.txt";
-        string path_mainbalance = Path.GetTempPath() + "/ae_mainbalance.txt";
-        string path_gpbalance = Path.GetTempPath() + "/ae_gpbalance.txt";
-        string path_gpbalancetemp = Path.GetTempPath() + "/ae_gpbalancetemp.txt";
-        string path_player = Path.GetTempPath() + "/ae_player.txt";
-        string path_gpname = Path.GetTempPath() + "/ae_gameprovidername.txt";
+        string path_gp = Path.GetTempPath() + "/ae_tf_gameprovider.txt";
+        string path_mainbalance = Path.GetTempPath() + "/ae_tf_mainbalance.txt";
+        string path_gpbalance = Path.GetTempPath() + "/ae_tf_gpbalance.txt";
+        string path_gpbalancetemp = Path.GetTempPath() + "/ae_tf_gpbalancetemp.txt";
+        string path_player = Path.GetTempPath() + "/ae_tf_player.txt";
+        string path_gpname = Path.GetTempPath() + "/ae_tf_gameprovidername.txt";
         private string start_time;
         private string seconds_parse;
         private bool isNoPlayerList = false;
         private bool isOpened = true;
         private bool isMaintenanceInserted = false;
+        private bool isNoFound;
 
         public Main_Form()
         {
@@ -83,7 +84,7 @@ namespace Atlas_Eyes
             }
 
             DeleteFile();
-            webBrowser.Navigate("http://cs.ying168.bet/account/login");
+            webBrowser.Navigate("http://cs.tianfa86.org/account/login");
         }
 
         private void DeleteFile()
@@ -127,14 +128,14 @@ namespace Atlas_Eyes
             {
                 if (e.Url == webBrowser.Url)
                 {
-                    if (webBrowser.Url.ToString().Equals("http://cs.ying168.bet/account/login"))
+                    if (webBrowser.Url.ToString().Equals("http://cs.tianfa86.org/account/login"))
                     {
                         //webBrowser.Document.GetElementById("csname").SetAttribute("value", "fyrain");
                         //webBrowser.Document.GetElementById("cspwd").SetAttribute("value", "djrain123@@@");
                         webBrowser.Document.Window.ScrollTo(0, webBrowser.Document.Window.Size.Height);
                     }
 
-                    if (webBrowser.Url.ToString().Equals("http://cs.ying168.bet/player/list"))
+                    if (webBrowser.Url.ToString().Equals("http://cs.tianfa86.org/player/list"))
                     {
                         if (!isNoPlayerList)
                         {
@@ -167,7 +168,7 @@ namespace Atlas_Eyes
                                 groupBox_result.Enabled = false;
                                 label_fetchedtime_1.Enabled = false;
                                 label_fetchedtime.Enabled = false;
-                                webBrowser.Navigate("http://cs.ying168.bet/player/list");
+                                webBrowser.Navigate("http://cs.tianfa86.org/player/list");
                                 MessageBox.Show("Please provide player username.");
                             }
                             else
@@ -198,38 +199,9 @@ namespace Atlas_Eyes
 
         private void timer_search_preview_Tick(object sender, EventArgs e)
         {
-            timer_search_preview.Stop();
-
             try
             {
-                HtmlElementCollection spans = webBrowser.Document.GetElementsByTagName("span");
-
-                foreach (HtmlElement span in spans)
-                {
-                    if (span.InnerHtml.ToString().Equals(player_list[current_player]))
-                    {
-                        string remove_brackets = Regex.Match(span.OuterHtml.ToString(), @"\(([^)]*)\)").Groups[1].Value;
-                        string[] results = remove_brackets.Replace("'", "").Split(',');
-
-                        int count = 0;
-
-                        foreach (string result in results)
-                        {
-                            count++;
-
-                            if (count == 1)
-                            {
-                                player_id = result.Replace(" ", "");
-                            }
-                            else if (count == 2)
-                            {
-                                player_name = result.Replace(" ", "");
-                            }
-                        }
-
-                        break;
-                    }
-                }
+                timer_search_preview.Stop();
 
                 HtmlElement table = webBrowser.Document.GetElementById("data");
                 var rows = table.GetElementsByTagName("tr");
@@ -239,28 +211,125 @@ namespace Atlas_Eyes
                     foreach (HtmlElement cell in row.GetElementsByTagName("td"))
                     {
                         i++;
+
                         string value = cell.InnerText;
-                        if (i == 2)
+                        if (value == "No matching records found" || value == "没有检索到数据")
                         {
-                            using (StringReader sr = new StringReader(value))
+                            label_result.Visible = false;
+
+                            dataGridView_result.Rows.Insert(0, player_list[current_player], "-", "-", "-");
+
+                            string backcolor = "#EE3A59";
+                            Color backcolor_change = ColorTranslator.FromHtml(backcolor);
+                            dataGridView_result.Rows[0].DefaultCellStyle.BackColor = backcolor_change;
+                            dataGridView_result.Rows[0].DefaultCellStyle.ForeColor = Color.Black;
+
+                            dataGridView_result.Sort(dataGridView_result.Columns["total"], ListSortDirection.Descending);
+                            dataGridView_result.ClearSelection();
+
+                            current_player++;
+                            if (current_player <= player_list.Count - 1)
                             {
-                                int count = 0;
-                                string line;
-                                while ((line = sr.ReadLine()) != null)
+                                _main_wallet = 0;
+                                _gp_wallet = 0;
+                                _total = 0;
+                                DeleteFile();
+                                webBrowser.Navigate("http://cs.tianfa86.org/player/list");
+                            }
+                            else
+                            {
+                                timer_refreshrate.Start();
+                                start_time = DateTime.Now.ToString("dd/MM/yyyy HH:mm:ss");
+                                seconds_parse = DateTime.Now.AddSeconds(refresh_rate + 2).ToString("dd/MM/yyyy HH:mm:ss");
+                                string time = DateTime.Now.ToString("HH:mm");
+                                label_fetchedtime.Text = time;
+                            }
+                        }
+                        else
+                        {
+                            if (i == 2)
+                            {
+                                string remove_brackets = Regex.Match(cell.OuterHtml.ToString(), @"\(([^)]*)\)").Groups[1].Value;
+                                string[] results = remove_brackets.Replace("'", "").Split(',');
+
+                                int count_ = 0;
+
+                                using (StringReader sr = new StringReader(value))
                                 {
-                                    count++;
-
-                                    if (count == 2)
+                                    int count = 0;
+                                    string line;
+                                    while ((line = sr.ReadLine()) != null)
                                     {
-                                        gpn = line;
+                                        count++;
 
-                                        timer_get_data.Start();
+                                        if (count == 2)
+                                        {
+                                            gpn = line;
+                                        }
+                                    }
+                                }
 
-                                        break;
+                                foreach (string result in results)
+                                {
+                                    count_++;
+
+                                    if (count_ == 1)
+                                    {
+                                        player_id = result.Replace(" ", "");
+                                    }
+                                    else if (count_ == 2)
+                                    {
+                                        player_name = result.Replace(" ", "");
+
+                                        if (player_name == player_list[current_player])
+                                        {
+                                            isNoFound = false;
+
+                                            timer_get_data.Start();
+
+                                            break;
+                                        }
+                                        else
+                                        {
+                                            isNoFound = true;
+                                        }
                                     }
                                 }
                             }
                         }
+                    }
+                }
+
+                if (isNoFound)
+                {
+                    label_result.Visible = false;
+
+                    dataGridView_result.Rows.Insert(0, player_list[current_player], "-", "-", "-");
+
+                    string backcolor = "#EE3A59";
+                    Color backcolor_change = ColorTranslator.FromHtml(backcolor);
+                    dataGridView_result.Rows[0].DefaultCellStyle.BackColor = backcolor_change;
+                    dataGridView_result.Rows[0].DefaultCellStyle.ForeColor = Color.Black;
+
+                    dataGridView_result.Sort(dataGridView_result.Columns["total"], ListSortDirection.Descending);
+                    dataGridView_result.ClearSelection();
+
+                    current_player++;
+                    if (current_player <= player_list.Count - 1)
+                    {
+                        _main_wallet = 0;
+                        _gp_wallet = 0;
+                        _total = 0;
+                        DeleteFile();
+                        webBrowser.Navigate("http://cs.tianfa86.org/player/list");
+                    }
+                    else
+                    {
+                        timer_refreshrate.Start();
+                        start_time = DateTime.Now.ToString("dd/MM/yyyy HH:mm:ss");
+                        seconds_parse = DateTime.Now.AddSeconds(refresh_rate + 2).ToString("dd/MM/yyyy HH:mm:ss");
+                        string time = DateTime.Now.ToString("HH:mm");
+                        label_fetchedtime.Text = time;
                     }
                 }
             }
@@ -285,7 +354,7 @@ namespace Atlas_Eyes
                     _gp_wallet = 0;
                     _total = 0;
                     DeleteFile();
-                    webBrowser.Navigate("http://cs.ying168.bet/player/list");
+                    webBrowser.Navigate("http://cs.tianfa86.org/player/list");
                 }
                 else
                 {
@@ -317,7 +386,7 @@ namespace Atlas_Eyes
             }
             catch (Exception err)
             {
-                webBrowser.Navigate("http://cs.ying168.bet/player/list");
+                webBrowser.Navigate("http://cs.tianfa86.org/player/list");
             }
 
             // Display in Table
@@ -331,7 +400,7 @@ namespace Atlas_Eyes
             wc.Headers.Add("Cookie: " + cookies);
             wc.Encoding = Encoding.UTF8;
             wc.Headers.Add("Content-Type", "application/x-www-form-urlencoded");
-            string result = await wc.DownloadStringTaskAsync("http://cs.ying168.bet/kzb/gp/v1/gps?playerid=" + player_id);
+            string result = await wc.DownloadStringTaskAsync("http://cs.tianfa86.org/kzb/gp/v1/gps?playerid=" + player_id);
 
             string reversestring = "";
             int length = result.Length - 1;
@@ -403,7 +472,7 @@ namespace Atlas_Eyes
             wc.Headers.Add("Cookie: " + cookies);
             wc.Encoding = Encoding.UTF8;
             wc.Headers.Add("Content-Type", "application/x-www-form-urlencoded");
-            string result = await wc.DownloadStringTaskAsync("http://cs.ying168.bet/kzb/player/mcbalance?playerid=" + player_id);
+            string result = await wc.DownloadStringTaskAsync("http://cs.tianfa86.org/kzb/player/mcbalance?playerid=" + player_id);
 
             try
             {
@@ -419,7 +488,7 @@ namespace Atlas_Eyes
             }
             catch (Exception err)
             {
-                MessageBox.Show(err.ToString());
+                //MessageBox.Show(err.ToString());
             }
 
         }
@@ -448,7 +517,7 @@ namespace Atlas_Eyes
                                     wc.Headers.Add("Cookie: " + cookies);
                                     wc.Encoding = Encoding.UTF8;
                                     wc.Headers.Add("Content-Type", "application/x-www-form-urlencoded");
-                                    string result_download = await wc.DownloadStringTaskAsync("http://cs.ying168.bet/kzb/gp/v1/balance?gpid=" + final_result + "&playerid=" + player_id + "&playername=" + player_name + "&gpn=3425819" + gpn);
+                                    string result_download = await wc.DownloadStringTaskAsync("http://cs.tianfa86.org/kzb/gp/v1/balance?gpid=" + final_result + "&playerid=" + player_id + "&playername=" + player_name + "&gpn=3425819" + gpn);
                                     //MessageBox.Show(final_result + " ------ " + result_download);
                                     try
                                     {
@@ -711,7 +780,7 @@ namespace Atlas_Eyes
                 _gp_wallet = 0;
                 _total = 0;
                 DeleteFile(); 
-                webBrowser.Navigate("http://cs.ying168.bet/player/list");
+                webBrowser.Navigate("http://cs.tianfa86.org/player/list");
             }
             else
             {
@@ -795,7 +864,7 @@ namespace Atlas_Eyes
                     streamReader.Close();
 
                     DeleteFile();
-                    webBrowser.Navigate("http://cs.ying168.bet/player/list");
+                    webBrowser.Navigate("http://cs.tianfa86.org/player/list");
                 }
                 else
                 {
@@ -896,7 +965,7 @@ namespace Atlas_Eyes
                     streamReader.Close();
                     
                     timer_reload.Stop();
-                    webBrowser.Navigate("http://cs.ying168.bet/player/list");
+                    webBrowser.Navigate("http://cs.tianfa86.org/player/list");
                 }
 
                 MessageBox.Show("Changes applied.");
@@ -910,7 +979,7 @@ namespace Atlas_Eyes
         private void timer_reload_Tick(object sender, EventArgs e)
         {
             timer_reload.Stop();
-            webBrowser.Navigate("http://cs.ying168.bet/player/list");
+            webBrowser.Navigate("http://cs.tianfa86.org/player/list");
         }
 
         private void pictureBox_loader_Click(object sender, EventArgs e)
@@ -921,7 +990,7 @@ namespace Atlas_Eyes
         private void timer_detect_Tick(object sender, EventArgs e)
         {
             timer_detect.Stop();
-            webBrowser.Navigate("http://cs.ying168.bet/player/list");
+            webBrowser.Navigate("http://cs.tianfa86.org/player/list");
         }
 
         private void Main_Form_FormClosing(object sender, FormClosingEventArgs e)
@@ -938,6 +1007,7 @@ namespace Atlas_Eyes
             try
             {
                 e.SortResult = Compare(e.CellValue1.ToString(), e.CellValue2.ToString());
+                e.Handled = true;
             }
             catch (Exception err)
             {

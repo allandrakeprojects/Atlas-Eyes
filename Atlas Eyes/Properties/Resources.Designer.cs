@@ -68,5 +68,25 @@ namespace Atlas_Eyes.Properties {
                 return ResourceManager.GetStream("altas_eyes", resourceCulture);
             }
         }
+        
+        /// <summary>
+        ///   Looks up a localized resource of type System.Drawing.Icon similar to (Icon).
+        /// </summary>
+        internal static System.Drawing.Icon FY {
+            get {
+                object obj = ResourceManager.GetObject("FY", resourceCulture);
+                return ((System.Drawing.Icon)(obj));
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized resource of type System.Drawing.Icon similar to (Icon).
+        /// </summary>
+        internal static System.Drawing.Icon TF {
+            get {
+                object obj = ResourceManager.GetObject("TF", resourceCulture);
+                return ((System.Drawing.Icon)(obj));
+            }
+        }
     }
 }

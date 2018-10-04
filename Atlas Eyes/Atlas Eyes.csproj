@@ -32,7 +32,7 @@
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
   <PropertyGroup>
-    <ApplicationIcon>icon.ico</ApplicationIcon>
+    <ApplicationIcon>Resources\TF.ico</ApplicationIcon>
   </PropertyGroup>
   <ItemGroup>
     <Reference Include="ChoETL, Version=1.0.8.4, Culture=neutral, processorArchitecture=MSIL">
@@ -102,6 +102,8 @@
   </ItemGroup>
   <ItemGroup>
     <Content Include="icon.ico" />
+    <None Include="Resources\FY.ico" />
+    <None Include="Resources\TF.ico" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>
